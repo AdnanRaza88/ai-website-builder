@@ -48,7 +48,7 @@ def get_provider(provider_id: str) -> ProviderSpec:
 def litellm_model_string(provider_id: str, model_name: str) -> str:
     spec = get_provider(provider_id)
     if provider_id == "opencode_zen":
-        return model_name
+        return f"openai/{model_name}"
     return f"{spec.litellm_prefix}/{model_name}"
 
 
