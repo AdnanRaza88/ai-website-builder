@@ -1,6 +1,6 @@
 from config.mcp_servers import build_registry
 from config.settings import settings
-from mcp.client import MCPManager, call_tool_sync
+from mcp_client.client import MCPManager, call_tool_sync
 
 
 def get_manager(sandbox_dir: str, github_token: str) -> MCPManager:
