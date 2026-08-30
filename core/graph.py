@@ -5,6 +5,16 @@ from agents import requirements_agent, prd_agent, trd_agent, architect_agent, co
 
 TERMINAL_STAGES = {"awaiting_user", "done", "failed"}
 
+STAGE_TO_NODE = {
+    "collecting_requirements": "requirements",
+    "requirements": "requirements",
+    "prd": "prd",
+    "trd": "trd",
+    "architecture": "architecture",
+    "coding": "coding",
+    "reviewing": "reviewing",
+}
+
 
 def build_graph(config: LLMConfig):
     graph = StateGraph(BuildState)
@@ -17,9 +27,13 @@ def build_graph(config: LLMConfig):
     graph.add_node("reviewing", lambda s: reviewer_agent.run(s, config))
 
     def route(state: BuildState) -> str:
-        if state["stage"] in TERMINAL_STAGES:
+        stage = state["stage"]
+        if stage in TERMINAL_STAGES:
             return END
-        return state["stage"]
+        node = STAGE_TO_NODE.get(stage)
+        if node is None:
+            return END
+        return node
 
     graph.set_conditional_entry_point(route)
     for node in ["requirements", "prd", "trd", "architecture", "coding", "reviewing"]:

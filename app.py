@@ -52,9 +52,8 @@ with left:
 
     if user_input and settings_values["api_key"]:
         state["conversation"].append({"role": "user", "content": user_input})
-        if state["stage"] in ("awaiting_user", "collecting_requirements"):
+        if state["stage"] in ("awaiting_user", "collecting_requirements", "failed"):
             state["stage"] = "collecting_requirements"
-        elif state["stage"] == "failed":
             state["error"] = None
 
         config = LLMConfig(
@@ -65,7 +64,11 @@ with left:
         )
 
         with st.spinner("Agents are working"):
-            state = run_step(state, config)
+            try:
+                state = run_step(state, config)
+            except Exception as exc:
+                state["error"] = f"graph failed: {exc}"
+                state["stage"] = "failed"
 
         save_session_state(session_id, user_token, state)
         st.rerun()
